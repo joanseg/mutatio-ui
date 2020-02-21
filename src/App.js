@@ -7,11 +7,33 @@ class App extends Component {
 
   constructor(props) {
     super(props)
-    this.web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
+
+    if (window.ethereum) {
+      this.web3 = new Web3(window.ethereum);
+      try {
+        window.ethereum.enable();
+
+        this.web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
+        this.contract = new this.web3.eth.Contract(
+          [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"INITIAL_SUPPLY","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}],
+          "0x4E569Ff0600061bE7a3a85E3fBB12bEcaE53A951"
+        )
+
+      } catch(error) {
+        console.log('error enabling access');
+      }
+    } else {
+      console.log('there is no this.ethereum')
+    }
+
+    // this.web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
     this.contract = new this.web3.eth.Contract(
       [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"INITIAL_SUPPLY","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}],
       "0x4E569Ff0600061bE7a3a85E3fBB12bEcaE53A951"
     )
+
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
 
     this.state = { myAccountAddress: "my contract address",
                     myAccountBalance: 0,
@@ -22,28 +44,32 @@ class App extends Component {
                     msg: ''
                   }
 
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
+
   }
   componentWillMount() {
-    this.web3.eth.getAccounts().then( accounts => {
-      if (accounts[0]) {
-        this.setState({ myAccountAddress: accounts[0]})
-        this.contract.methods.balanceOf(accounts[0]).call().then( balance => {
-          this.contract.methods.decimals().call().then( decimals => {
-            this.contract.methods.symbol().call().then( tokenSymbol => {
-              this.setState({
-                tokenSymbol: tokenSymbol,
-                decimals: decimals,
-                myAccountBalance: balance / (Math.pow(10, decimals))
+    if (this.web3) {
+      this.web3.eth.getAccounts().then( accounts => {
+        if (accounts[0]) {
+          this.setState({ myAccountAddress: accounts[0]})
+          this.contract.methods.balanceOf(accounts[0]).call().then( balance => {
+            this.contract.methods.decimals().call().then( decimals => {
+              this.contract.methods.symbol().call().then( tokenSymbol => {
+                this.setState({
+                  tokenSymbol: tokenSymbol,
+                  decimals: decimals,
+                  myAccountBalance: balance / (Math.pow(10, decimals))
+                })
               })
             })
           })
-        })
-      } else {
-        this.setState({ myAccountAddress: "undefined: Log in to Metamask."})
-      }
-    })
+        } else {
+          this.setState({ myAccountAddress: "undefined: Log in to Metamask."})
+        }
+      })
+    } else {
+      this.state.msg = 'Install Metamask please'
+    }
+
   }
 
   handleInputChange(event) {
@@ -80,7 +106,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <h1>Hello world</h1>
+        <h1>Hello the newMetamask privacy mode</h1>
         <div>Your address is {this.state.myAccountAddress}</div>
         <div>You have {this.state.myAccountBalance} {this.state.tokenSymbol} tokens</div>
         <form onSubmit={this.handleSubmit}>
