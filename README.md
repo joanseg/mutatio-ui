@@ -1,68 +1,92 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![Rimble Demo App](./_assets/rimble-demo-2.webp)
 
-## Available Scripts
+# Rimble Demo App
 
-In the project directory, you can run:
+This is a React dApp that uses the Rimble UI component library and Rimble Web3 Components to walk a new user through connecting, verifying and transacting with a smart contract deployed to the Ethereum Rinkeby testnet.
 
-### `yarn start`
+[Live Demo](https://rimble-app-demo.netlify.com/)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Overview
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- Implements Rimble UI, a dApp-first design system for faster dApp development
+- Integrates Rimble Web3 Components with web3 provider for better dApp UX
+- Wraps common web3 functions for consumption by React components
 
-### `yarn test`
+### Requirements
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- [node 9+](https://nodejs.org/en/)
+- [git](https://git-scm.com/downloads)
+- [yarn](https://yarnpkg.com/en/docs/install)
 
-### `yarn build`
+## Quick start
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Clone the repo
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+```bash
+git clone https://github.com/ConsenSys/rimble-app-demo
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Change directories
 
-### `yarn eject`
+```bash
+cd rimble-toast-demo
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Install dependencies
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+yarn install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Start local server
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+yarn start
+```
 
-## Learn More
+Navigate to http://localhost:3000 in your browser
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Modifying smart contract
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The smart contract address and the application binary interface (ABI) for the contract are both in the `SmartContractCard.js` file. Update these constants with your own smart contract details.
 
-### Code Splitting
+### Calling methods
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+The `RimbleWeb3.js` component passes a proper for the `web3.eth.contract.send` method and only needs the smart contract's method name.
 
-### Analyzing the Bundle Size
+### Onboarding Flow
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+The dApp demonstrates an informative, tested, and effective UI to get user's connected to your app and interacting with minimal frustration. The dApp addresses these scenarios:
 
-### Making a Progressive Web App
+- Not on a web3-capable browser
+- No MetaMask (web3) extension available
+- Connected to wrong Ethereum network
+- EIP 1102 Connection request (with graceful fallback)
+- Personal signature request of specialized nonce to ensure connection with wallet's owner
+- Helper modals for low funds and instructions to acquire ETH
+- Transaction-initiated modals that will connect, verify, and check funds with 1 click
+- Polling for account changes and balance updates
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+[View full onboarding flow](https://whimsical.com/AEj6t36cCytKBciCzT8WoL)
 
-### Advanced Configuration
+### Customize toast message content
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+You can customize the toast message content. See Rimble's content guidance for writing toast messages.
+[Read content guidance](https://consensys.github.io/rimble-ui/?selectedKind=ToastMessage&selectedStory=ToastMessage&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
-### Deployment
+### Lifecycle states
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+This is meant to enhance the existing web3 states and show relevant transaction detail to the user to monitor the progress of the transaction.
 
-### `yarn build` fails to minify
+- Start
+- Pending
+- First confirmation
+- Success
+- Failure
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## Resources
+
+- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- [web3.js documentation (0.2x.x)](https://github.com/ethereum/wiki/wiki/JavaScript-API)
+- [About Rimble UI](https://rimble.consensys.design/)
+- [Remix IDE for deploying smart contracts](https://remix.ethereum.org/)

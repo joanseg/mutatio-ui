@@ -1,137 +1,144 @@
-import React, { Component } from 'react';
-import { Flex, Box, Heading, Form, Input, Button, EthAddress } from 'rimble-ui';
-import './App.css';
-import Web3 from 'web3';
-//import { CERTIFICATE_ABI, CERTIFICATE_ADDRESS} from '/config'; // alternative way to import contract to test on ganache
+import React, { Component } from "react";
+import { ThemeProvider, Box, Flex, Card, Text, Heading } from "rimble-ui";
+
+import RimbleWeb3 from "./utilities/RimbleWeb3";
+import ConnectionBanner from "@rimble/connection-banner";
+import NetworkIndicator from "@rimble/network-indicator";
+
+import Header from "./components/Header";
+import WalletBlock from "./components/WalletBlock";
+import PrimaryCard from "./components/PrimaryCard";
+import InstructionsCard from "./components/InstructionsCard";
+import Web3Debugger from "./components/Web3Debugger";
 
 class App extends Component {
+  state = {
+    route: "default"
+  };
 
-  constructor(props) {
-    super(props)
+  // Optional parameters to pass into RimbleWeb3
+  config = {
+    accountBalanceMinimum: 0.001,
+    requiredNetwork: 5777
+  };
 
-    if (window.ethereum) {
-      this.web3 = new Web3(window.ethereum);
-      try {
-        window.ethereum.enable();
-
-        this.web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
-        this.contract = new this.web3.eth.Contract(
-          [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"INITIAL_SUPPLY","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}],
-          "0x4E569Ff0600061bE7a3a85E3fBB12bEcaE53A951"
-        )
-        //this.contract = new this.web3.eth.Contract( CERTIFICATE_ABI, CERTIFICATE_ADDRESS ) //Way to import the contract to test on Ganache
-      } catch(error) {
-        console.log('error enabling access');
-      }
-    } else {
-      console.log('there is no this.ethereum')
-    }
-
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-
-    this.state = { myAccountAddress: "my contract address",
-                    myAccountBalance: 0,
-                    tokenSymbol: "???",
-                    decimals: 0,
-                    numberOfTokensToSend: 0,
-                    addressTo: '',
-                    msg: ''
-                  }
-  }
-  componentWillMount() {
-    if (this.web3) {
-      this.web3.eth.getAccounts().then( accounts => {
-        if (accounts[0]) {
-          this.setState({ myAccountAddress: accounts[0]})
-          this.contract.methods.balanceOf(accounts[0]).call().then( balance => {
-            this.contract.methods.decimals().call().then( decimals => {
-              this.contract.methods.symbol().call().then( tokenSymbol => {
-                this.setState({
-                  tokenSymbol: tokenSymbol,
-                  decimals: decimals,
-                  myAccountBalance: balance / (Math.pow(10, decimals))
-                })
-              })
-            })
-          })
-        } else {
-          this.setState({ myAccountAddress: "undefined: Log in to Metamask."})
-        }
-      })
-    } else {
-      this.state.msg = 'Install Metamask please'
-    }
-  }
-
-  handleInputChange(event) {
-    const target = event.target
-    const value = target.value
-    const name = target.name
-    console.log("input " + name + " value has been changed to " + value)
-
+  showRoute = route => {
     this.setState({
-      [name]: value
-    })
-  }
-
-  handleSubmit(event) {
-    event.preventDefault()
-    console.log("button pressed")
-
-    const addressTo = this.state.addressTo
-    const decimals = this.state.decimals
-    const numberOfTokensToSend = this.state.numberOfTokensToSend * Math.pow(10, decimals)
-    const myAccount = this.state.myAccountAddress
-    console.log("numberOfTokensToSend = " + numberOfTokensToSend)
-    console.log("addressTo = " + addressTo)
-
-    this.contract.methods.transfer(addressTo, numberOfTokensToSend).send({from: myAccount})
-      .on('transactionHash', function(hash) {
-        this.setState({msg: "You will be able to find your transaction here https://rinkeby.etherscan.io/tx" + hash})
-      }.bind(this))
-      .on('error', function(error) {
-        this.setState({msg: "Error occured: " + error})
-      }.bind(this))
-  }
+      route
+    });
+  };
 
   render() {
     return (
-      <div>
-        <Heading as={"h1"} mb={3}>Hello the newMetamask privacy mode</Heading>
-        <Flex>
-          <Box>
-            <EthAddress p={2} width={1} address={this.state.myAccountAddress} />
-          </Box>
-        </Flex>
-        <div>You have {this.state.myAccountBalance} {this.state.tokenSymbol} tokens</div>
-        <Form onSubmit={this.handleSubmit}>
-          <label>
-            Send <Input
-              type="number"
-              name="numberOfTokensToSend"
-              value={this.state.numberOfTokensToSend}
-              onChange={this.handleInputChange}
-            /> tokens
-          </label>
-          <br />
-          <label>
-            To <Input
-              type="text"
-              name="addressTo"
-              value={this.state.addressTo}
-              onChange={this.handleInputChange}
-            /> address
-          </label>
-          <Input type="submit" value="Submit"/>
-        </Form>
-        <div>Message: {this.state.msg}</div>
-        <div>
-          <Button size={'medium'}>
-                      Click me!
-          </Button>
-        </div>
-      </div>
+      <ThemeProvider>
+        <RimbleWeb3 config={this.config}>
+          <RimbleWeb3.Consumer>
+            {({
+              needsPreflight,
+              validBrowser,
+              userAgent,
+              web3,
+              account,
+              accountBalance,
+              accountBalanceLow,
+              initAccount,
+              rejectAccountConnect,
+              userRejectedConnect,
+              accountValidated,
+              accountValidationPending,
+              rejectValidation,
+              userRejectedValidation,
+              validateAccount,
+              connectAndValidateAccount,
+              modals,
+              network,
+              transaction,
+              web3Fallback
+            }) => (
+              <Box>
+                <Header
+                  account={account}
+                  accountBalance={accountBalance}
+                  accountBalanceLow={accountBalanceLow}
+                  initAccount={initAccount}
+                  rejectAccountConnect={rejectAccountConnect}
+                  userRejectedConnect={userRejectedConnect}
+                  accountValidated={accountValidated}
+                  accountValidationPending={accountValidationPending}
+                  rejectValidation={rejectValidation}
+                  userRejectedValidation={userRejectedValidation}
+                  validateAccount={validateAccount}
+                  connectAndValidateAccount={connectAndValidateAccount}
+                  modals={modals}
+                  network={network}
+                />
+
+                <Box maxWidth={'640px'} mx={'auto'} p={3} >
+                  <ConnectionBanner
+                    currentNetwork={network.current.id}
+                    requiredNetwork={this.config.requiredNetwork}
+                    onWeb3Fallback={web3Fallback}
+                  />
+                </Box>
+                <Card maxWidth={'640px'} mx={'auto'} p={3} px={4}>
+                  <NetworkIndicator
+                    currentNetwork={network.current.id}
+                    requiredNetwork={network.required.id}
+                  />
+                </Card>
+
+                <RimbleWeb3.Consumer>
+                  {({
+                    contract,
+                    account,
+                    transactions,
+                    initContract,
+                    initAccount,
+                    contractMethodSendWrapper
+                  }) => (
+                    <WalletBlock 
+                      account={account}
+                      accountBalance={accountBalance}
+                      accountBalanceLow={accountBalanceLow}
+                      accountValidated={accountValidated}
+                      connectAndValidateAccount={connectAndValidateAccount}
+                      initContract={initContract}
+                      contract={contract}
+                    />
+                  )}
+                </RimbleWeb3.Consumer>
+                
+
+                {this.state.route === "default" ? <PrimaryCard /> : null}
+
+                {this.state.route === "onboarding" ? (
+                  <Web3Debugger
+                    validBrowser={validBrowser}
+                    userAgent={userAgent}
+                    web3={web3}
+                    account={account}
+                    accountBalance={accountBalance}
+                    accountBalanceLow={accountBalanceLow}
+                    initAccount={initAccount}
+                    rejectAccountConnect={rejectAccountConnect}
+                    userRejectedConnect={userRejectedConnect}
+                    accountValidated={accountValidated}
+                    accountValidationPending={accountValidationPending}
+                    rejectValidation={rejectValidation}
+                    userRejectedValidation={userRejectedValidation}
+                    validateAccount={validateAccount}
+                    connectAndValidateAccount={connectAndValidateAccount}
+                    modals={modals}
+                    network={network}
+                    transaction={transaction}
+                  />
+                ) : null}
+                
+              </Box>
+            )}
+          </RimbleWeb3.Consumer>
+        </RimbleWeb3>
+      </ThemeProvider>
     );
   }
 }
